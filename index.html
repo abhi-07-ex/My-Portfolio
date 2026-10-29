@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shivansh Dwivedi | Portfolio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyberVoid: '#030712',
+                        hudBg: 'rgba(5, 11, 24, 0.72)',
+                        cyanNeon: '#00f0ff',
+                        blueNeon: '#3b82f6',
+                        violetNeon: '#8b5cf6',
+                        emeraldNeon: '#10b981',
+                        neonPink: '#ff007f'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        cyber: ['Orbitron', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'neon-cyan': '0 0 25px -3px rgba(0, 240, 255, 0.45)',
+                        'neon-blue': '0 0 25px -3px rgba(59, 130, 246, 0.45)',
+                        'neon-violet': '0 0 25px -3px rgba(139, 92, 246, 0.45)',
+                        'neon-pink': '0 0 25px -3px rgba(255, 0, 127, 0.45)'
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 20s linear infinite',
+                        'float': 'float 4s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-12px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background-color: #030712;
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        ::selection {
+            background: #00f0ff;
+            color: #030712;
+        }
+
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: auto;
+        }
+
+        .cyber-panel {
+            background: rgba(5, 11, 26, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 240, 255, 0.18);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(0, 240, 255, 0.03);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .cyber-panel:hover {
+            border-color: rgba(0, 240, 255, 0.45);
+            box-shadow: 0 12px 35px -5px rgba(0, 240, 255, 0.2), inset 0 0 20px rgba(0, 240, 255, 0.08);
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 35;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 3px, 4px 100%;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        .scanlines.disabled {
+            opacity: 0;
+        }
+
+        .glow-text-cyan {
+            text-shadow: 0 0 12px rgba(0, 240, 255, 0.7), 0 0 24px rgba(0, 240, 255, 0.4);
+        }
+        .glow-text-violet {
+            text-shadow: 0 0 12px rgba(139, 92, 246, 0.7), 0 0 24px rgba(139, 92, 246, 0.4);
+        }
+
+        .cyber-cursor {
+            display: inline-block;
+            width: 3px;
+            background: #00f0ff;
+            margin-left: 3px;
+            animation: cursorBlink 0.9s infinite;
+        }
+        @keyframes cursorBlink {
+            0%, 100% { opacity: 1; box-shadow: 0 0 10px #00f0ff; }
+            50% { opacity: 0; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030712;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #00f0ff, #3b82f6, #8b5cf6);
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="selection:bg-cyan-400 selection:text-slate-950">
+
+    <!-- 3D Three.js WebGL Canvas -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Scanline Filter Overlay -->
+    <div id="scanlineOverlay" class="scanlines"></div>
+
+    <!-- 3D Raycast Tooltip HUD -->
+    <div id="raycastTooltip" class="fixed pointer-events-none z-50 px-3 py-1.5 rounded-lg cyber-panel text-[11px] font-mono text-cyanNeon border border-cyanNeon/50 shadow-neon-cyan transform -translate-x-1/2 -translate-y-12 opacity-0 transition-opacity duration-200">
+        <span id="tooltipContent">Neural Node</span>
+    </div>
+
+    <!-- Top Persistent HUD Bar -->
+    <header class="fixed top-0 left-0 w-full z-40 cyber-panel border-b border-cyanNeon/20 py-3.5 px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="#" class="flex items-center space-x-3 group" onclick="soundEngine.playChirp()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-violet-600 p-[1.5px] shadow-neon-cyan flex items-center justify-center">
+                    <div class="w-full h-full bg-slate-950 rounded-xl flex items-center justify-center font-cyber font-black text-cyanNeon text-xs tracking-tighter">
+                        SD
+                    </div>
+                </div>
+                <div>
+                    <span class="font-cyber font-bold tracking-wider text-sm sm:text-base text-white flex items-center gap-1.5">
+                        SHIVANSH <span class="text-cyanNeon glow-text-cyan">DWIVEDI</span>
+                    </span>
+                    <span class="text-[9px] font-mono block text-cyan-400/70 tracking-widest uppercase">
+                        ML // IoT Architecture
+                    </span>
+                </div>
+            </a>
+
+            <!-- Desktop HUD Nav Links -->
+            <nav class="hidden md:flex items-center space-x-1 bg-slate-950/80 p-1.5 rounded-full border border-cyanNeon/20 font-mono text-xs text-slate-300">
+                <a href="#about" class="px-3.5 py-1.5 rounded-full hover:text-cyanNeon hover:bg-cyan-950/40 transition-all">01//About</a>
+                <a href="#skills" class="px-3.5 py-1.5 rounded-full hover:text-cyanNeon hover:bg-cyan-950/40 transition-all">02//Skills</a>
+                <a href="#projects" class="px-3.5 py-1.5 rounded-full hover:text-cyanNeon hover:bg-cyan-950/40 transition-all">03//Projects</a>
+                <a href="#certificates" class="px-3.5 py-1.5 rounded-full hover:text-cyanNeon hover:bg-cyan-950/40 transition-all">04//Certificates</a>
+                <a href="#experience" class="px-3.5 py-1.5 rounded-full hover:text-cyanNeon hover:bg-cyan-950/40 transition-all">05//Milestones</a>
+                <a href="#terminal" class="px-3.5 py-1.5 rounded-full hover:text-cyanNeon hover:bg-cyan-950/40 transition-all">06//Console</a>
+                <a href="#contact" class="px-3.5 py-1.5 rounded-full hover:text-cyanNeon hover:bg-cyan-950/40 transition-all">07//Transmit</a>
+            </nav>
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button id="audioToggleBtn" onclick="toggleAudio()" class="w-9 h-9 rounded-xl cyber-panel border border-slate-700 hover:border-cyanNeon text-slate-300 hover:text-cyanNeon flex items-center justify-center text-xs transition-colors" title="Toggle Ambient WebAudio">
+                    <i class="fa-solid fa-volume-xmark" id="audioIcon"></i>
+                </button>
+
+                <button onclick="toggleScanlines()" class="w-9 h-9 rounded-xl cyber-panel border border-slate-700 hover:border-cyanNeon text-slate-300 hover:text-cyanNeon flex items-center justify-center text-xs transition-colors" title="Toggle Scanline Filter">
+                    <i class="fa-solid fa-tv"></i>
+                </button>
+
+                <a href="C:\Users\shiva\OneDrive\Desktop\shivansh\Shivansh Dwivedi analyst resume.pdf" download="C:\Users\shiva\OneDrive\Desktop\shivansh\Shivansh Dwivedi analyst resume.pdf" onclick="soundEngine.playChirp()" class="hidden sm:flex px-4 py-2 rounded-xl bg-gradient-to-r from-cyanNeon to-blue-600 text-slate-950 font-cyber font-bold text-xs uppercase tracking-wider shadow-neon-cyan hover:brightness-110 items-center gap-1.5 transition-all">
+                    <i class="fa-solid fa-download text-xs"></i> <span>Data CV</span>
+                </a>
+
+                <button id="mobileNavToggle" class="md:hidden w-9 h-9 rounded-xl cyber-panel border border-slate-700 text-slate-300 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-bars" id="mobileNavIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Panel -->
+        <div id="mobileNavDropdown" class="hidden md:hidden mt-3 p-4 rounded-2xl cyber-panel border border-cyanNeon/30 flex flex-col space-y-2 text-xs font-mono">
+            <a href="#about" class="mobile-item py-1.5 px-3 rounded hover:bg-cyan-950/50 hover:text-cyanNeon">01// About Vision</a>
+            <a href="#skills" class="mobile-item py-1.5 px-3 rounded hover:bg-cyan-950/50 hover:text-cyanNeon">02// Skills Matrix</a>
+            <a href="#projects" class="mobile-item py-1.5 px-3 rounded hover:bg-cyan-950/50 hover:text-cyanNeon">03// Featured Projects</a>
+            <a href="#certificates" class="mobile-item py-1.5 px-3 rounded hover:bg-cyan-950/50 hover:text-cyanNeon">04// Verified Certifications</a>
+            <a href="#experience" class="mobile-item py-1.5 px-3 rounded hover:bg-cyan-950/50 hover:text-cyanNeon">05// Timeline & Awards</a>
+            <a href="#terminal" class="mobile-item py-1.5 px-3 rounded hover:bg-cyan-950/50 hover:text-cyanNeon">06// Cyber CLI Terminal</a>
+            <a href="#contact" class="mobile-item py-1.5 px-3 rounded hover:bg-cyan-950/50 hover:text-cyanNeon">07// Direct Transmission</a>
+            <a href="C:\Users\shiva\OneDrive\Desktop\shivansh\Shivansh Dwivedi analyst resume.pdf" download="C:\Users\shiva\OneDrive\Desktop\shivansh\Shivansh Dwivedi analyst resume.pdf" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyanNeon to-blue-600 text-slate-950 font-cyber font-bold text-xs uppercase tracking-wider shadow-neon-cyan mt-2 text-center block">
+                Download Resume PDF
+            </a>
+        </div>
+    </header>
+
+    <!-- Telemetry HUD Corner Widget -->
+    <div class="fixed bottom-4 left-4 z-40 hidden lg:block cyber-panel p-3.5 rounded-2xl border border-cyanNeon/30 text-[10px] font-mono text-cyan-400/90 shadow-lg pointer-events-none">
+        <div class="flex items-center space-x-2 border-b border-cyanNeon/20 pb-1.5 mb-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span class="font-cyber font-bold text-white tracking-widest uppercase">THREE.JS TELEMETRY</span>
+        </div>
+        <div class="space-y-1 text-slate-300">
+            <div>CAM POS: <span id="teleCamPos" class="text-cyanNeon">X:0 Y:0 Z:13</span></div>
+            <div>ROTATION: <span id="teleCamRot" class="text-violetNeon">0.00 / 0.00</span></div>
+            <div>FPS: <span id="teleFps" class="text-emerald-400 font-bold">60 FPS</span></div>
+            <div>MESH NODES: <span class="text-amber-300">5 ACTIVE</span></div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Popup -->
+    <div id="hudToast" class="fixed bottom-6 right-6 z-50 transform translate-y-32 opacity-0 transition-all duration-300 pointer-events-none cyber-panel text-white px-5 py-3.5 rounded-2xl border border-cyanNeon/50 shadow-neon-cyan flex items-center space-x-3 max-w-sm">
+        <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyanNeon flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-satellite-dish" id="hudToastIcon"></i>
+        </div>
+        <div class="text-xs font-mono">
+            <p id="hudToastMsg" class="font-medium">Transmission logged successfully.</p>
+        </div>
+    </div>
+
+    <main class="relative z-10 pt-24 sm:pt-28">
+
+        <!-- 1. Hero Section -->
+        <section class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16 relative">
+            <div class="max-w-5xl mx-auto text-center flex flex-col items-center">
+                
+                <div class="relative mb-8 group cursor-pointer" onclick="soundEngine.playLaser(); pulse3DCore();">
+                    <div class="absolute -inset-3 bg-gradient-to-r from-cyanNeon via-blueNeon to-violetNeon rounded-full blur-xl opacity-60 group-hover:opacity-100 transition duration-700 animate-spin-slow"></div>
+                    <div class="absolute -inset-1 bg-cyanNeon/40 rounded-full blur-md animate-pulse"></div>
+
+                    <div class="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full p-[3px] bg-gradient-to-tr from-cyanNeon via-blue-500 to-violetNeon shadow-neon-cyan">
+                        <div class="w-full h-full rounded-full overflow-hidden bg-slate-950 border-2 border-slate-900 relative">
+                            <img 
+                                src="C:\Users\shiva\OneDrive\Desktop\shivansh\WhatsApp Image 2026-10-25 at 10.36.43 PM.jpeg" 
+                                alt="Shivansh Dwivedi Avatar" 
+                                class="w-full h-full object-cover object-top filter brightness-95 contrast-105 group-hover:scale-110 transition-transform duration-700"
+                                onerror="this.onerror=null; this.src='https://placehold.co/400x400/030712/00f0ff?text=Shivansh+Dwivedi';"
+                            />
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-cyan-950/10 to-transparent pointer-events-none"></div>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-2 right-4 flex items-center justify-center">
+                        <span class="animate-ping absolute inline-flex h-4 w-4 rounded-full bg-emerald-400 opacity-80"></span>
+                        <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-400 border-2 border-slate-950 shadow-neon-cyan"></span>
+                    </div>
+                </div>
+
+                <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full cyber-panel border border-cyanNeon/40 text-cyanNeon text-xs font-mono tracking-widest uppercase mb-6 shadow-neon-cyan">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Ready for AI // Machine Learning & IoT Deployments</span>
+                </div>
+
+                <h1 class="text-4xl sm:text-6xl md:text-7xl font-black font-cyber tracking-wide text-white mb-4 leading-tight">
+                    SHIVANSH <span class="bg-gradient-to-r from-cyanNeon via-blue-400 to-violetNeon bg-clip-text text-transparent glow-text-cyan">DWIVEDI</span>
+                </h1>
+
+                <div class="h-12 flex items-center justify-center text-lg sm:text-2xl md:text-3xl font-mono text-slate-200 font-semibold mb-6">
+                    <span class="text-cyanNeon mr-2">&gt;</span>
+                    <span id="heroTypewriterText"></span>
+                    <span class="cyber-cursor h-7 sm:h-8"></span>
+                </div>
+
+                <p class="max-w-2xl text-slate-400 text-sm sm:text-base md:text-lg mb-10 leading-relaxed font-normal">
+                    Fusing <span class="text-cyanNeon font-semibold">Predictive Machine Learning</span>, <span class="text-blue-400 font-semibold">Real-Time Industrial IoT</span> telemetry protocols, and <span class="text-violet-400 font-semibold">Scalable Web Architectures</span> into unified, interactive spatial systems.
+                </p>
+
+                <div class="flex flex-wrap gap-4 justify-center items-center mb-12">
+                    <a href="#projects" onclick="soundEngine.playChirp()" class="px-8 py-3.5 rounded-2xl font-cyber font-bold text-xs uppercase tracking-wider text-slate-950 bg-gradient-to-r from-cyanNeon via-cyan-400 to-blue-500 shadow-neon-cyan hover:shadow-cyan-400/80 transition-all transform hover:-translate-y-1 flex items-center gap-2">
+                        <i class="fa-solid fa-cube"></i> Explore Projects
+                    </a>
+                    
+                    <a href="#terminal" onclick="soundEngine.playChirp()" class="px-7 py-3.5 rounded-2xl font-mono text-xs text-white cyber-panel border border-cyanNeon/40 hover:border-cyanNeon hover:text-cyanNeon transition-all transform hover:-translate-y-1 flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-cyanNeon"></i> Launch CLI Shell
+                    </a>
+
+                    <a href="#contact" onclick="soundEngine.playChirp()" class="px-7 py-3.5 rounded-2xl font-mono text-xs text-slate-300 cyber-panel border border-violet-500/40 hover:border-violetNeon hover:text-violetNeon transition-all transform hover:-translate-y-1 flex items-center gap-2">
+                        <i class="fa-solid fa-satellite"></i> Connect Node
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. About Me Section -->
+        <section id="about" class="py-24 px-4 sm:px-6 lg:px-8 border-t border-cyanNeon/10 relative">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="text-xs uppercase tracking-widest text-cyanNeon font-mono font-bold bg-cyan-950/40 px-3.5 py-1 rounded-full border border-cyanNeon/30">
+                        01 // SYSTEM SPECIFICATIONS
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-black font-cyber text-white mt-4">ABOUT MY ARCHITECTURE</h2>
+                    <div class="w-24 h-1 bg-gradient-to-r from-cyanNeon via-blue-500 to-violet-500 mx-auto mt-4 rounded-full shadow-neon-cyan"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="cyber-panel p-8 rounded-3xl group hover:-translate-y-2 transition-all">
+                        <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyanNeon/40 text-cyanNeon flex items-center justify-center text-2xl mb-6 shadow-neon-cyan">
+                            <i class="fa-solid fa-microchip"></i>
+                        </div>
+                        <h3 class="text-xl font-bold font-cyber text-white mb-2">Academic Core</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            Information Technology specialist focused on Applied Artificial Intelligence, Distance Matrix Algorithms, and Embedded Hardware Engineering.
+                        </p>
+                        <div class="pt-4 border-t border-cyanNeon/20 flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-400">Cumulative GPA</span>
+                            <span class="text-cyanNeon font-bold bg-cyan-950/60 px-2.5 py-1 rounded border border-cyanNeon/30">3.8 / 4.0</span>
+                        </div>
+                    </div>
+
+                    <div class="cyber-panel p-8 rounded-3xl group hover:-translate-y-2 transition-all">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blueNeon/40 text-blueNeon flex items-center justify-center text-2xl mb-6 shadow-neon-blue">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <h3 class="text-xl font-bold font-cyber text-white mb-2">Predictive AI Systems</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            Building production data pipelines, automated machine efficiency metrics, dynamic dashboards, and Scikit-Learn predictive modeling.
+                        </p>
+                        <div class="pt-4 border-t border-cyanNeon/20 flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-400">Core Domain</span>
+                            <span class="text-blue-400 font-bold bg-blue-950/60 px-2.5 py-1 rounded border border-blue-500/30">ML Ops & BI</span>
+                        </div>
+                    </div>
+
+                    <div class="cyber-panel p-8 rounded-3xl group hover:-translate-y-2 transition-all">
+                        <div class="w-14 h-14 rounded-2xl bg-violet-500/10 border border-violetNeon/40 text-violetNeon flex items-center justify-center text-2xl mb-6 shadow-neon-violet">
+                            <i class="fa-solid fa-wifi"></i>
+                        </div>
+                        <h3 class="text-xl font-bold font-cyber text-white mb-2">IoT Telemetry Fabric</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            Firmware engineering across ESP32/ESP8266 platforms, industrial monitoring protocols, event-driven rule engines, and encrypted MQTT broker meshes.
+                        </p>
+                        <div class="pt-4 border-t border-cyanNeon/20 flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-400">Fabric Stack</span>
+                            <span class="text-violet-400 font-bold bg-violet-950/60 px-2.5 py-1 rounded border border-violet-500/30">ESP32 &bull; MQTT</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Skills Matrix -->
+        <section id="skills" class="py-24 px-4 sm:px-6 lg:px-8 border-t border-cyanNeon/10 relative">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="text-xs uppercase tracking-widest text-cyanNeon font-mono font-bold bg-cyan-950/40 px-3.5 py-1 rounded-full border border-cyanNeon/30">
+                        02 // CAPACITY MATRIX
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-black font-cyber text-white mt-4">SKILLS & PROTOCOLS</h2>
+                    <div class="w-24 h-1 bg-gradient-to-r from-cyanNeon via-blue-500 to-violet-500 mx-auto mt-4 rounded-full shadow-neon-cyan"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="cyber-panel p-7 rounded-3xl">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyanNeon flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-code"></i>
+                            </div>
+                            <h3 class="text-lg font-bold font-cyber text-white">Languages</h3>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1.5">
+                                    <span class="text-slate-200 flex items-center gap-1.5"><i class="fa-brands fa-python text-yellow-400"></i> Python (Data & ML)</span>
+                                    <span class="text-cyanNeon font-bold">98%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-cyanNeon to-blue-500 rounded-full" style="width: 98%;"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1.5">
+                                    <span class="text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-database text-cyan-300"></i> SQL (PostgreSQL / MySQL)</span>
+                                    <span class="text-cyanNeon font-bold">90%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-cyanNeon to-blue-500 rounded-full" style="width: 90%;"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1.5">
+                                    <span class="text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-terminal text-blue-400"></i> C / Embedded C</span>
+                                    <span class="text-cyanNeon font-bold">82%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-cyanNeon to-blue-500 rounded-full" style="width: 82%;"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1.5">
+                                    <span class="text-slate-200 flex items-center gap-1.5"><i class="fa-brands fa-js text-amber-300"></i> JavaScript / Three.js</span>
+                                    <span class="text-cyanNeon font-bold">86%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-cyanNeon to-blue-500 rounded-full" style="width: 86%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cyber-panel p-7 rounded-3xl">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blueNeon flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <h3 class="text-lg font-bold font-cyber text-white">AI & Analytics</h3>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1.5">
+                                    <span class="text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-brain text-teal-400"></i> Scikit-Learn Algorithms</span>
+                                    <span class="text-blueNeon font-bold">90%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" style="width: 90%;"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1.5">
+                                    <span class="text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-table text-indigo-400"></i> Pandas & NumPy</span>
+                                    <span class="text-blueNeon font-bold">95%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" style="width: 95%;"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1.5">
+                                    <span class="text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-chart-pie text-amber-400"></i> Power BI Dashboards</span>
+                                    <span class="text-blueNeon font-bold">85%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" style="width: 85%;"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1.5">
+                                    <span class="text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-diagram-project text-emerald-400"></i> Feature Engineering</span>
+                                    <span class="text-blueNeon font-bold">88%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" style="width: 88%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cyber-panel p-7 rounded-3xl">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-10 h-10 rounded-xl bg-violet-500/20 text-violetNeon flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-network-wired"></i>
+                            </div>
+                            <h3 class="text-lg font-bold font-cyber text-white">IoT & Cloud</h3>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1.5">
+                                    <span class="text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-microchip text-violet-400"></i> ESP32 Microcontrollers</span>
+                                    <span class="text-violetNeon font-bold">92%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full" style="width: 92%;"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1.5">
+                                    <span class="text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-wifi text-emerald-400"></i> MQTT Protocols & Edge</span>
+                                    <span class="text-violetNeon font-bold">88%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full" style="width: 88%;"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1.5">
+                                    <span class="text-slate-200 flex items-center gap-1.5"><i class="fa-brands fa-git-alt text-rose-400"></i> Git & GitHub Actions</span>
+                                    <span class="text-violetNeon font-bold">90%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full" style="width: 90%;"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-mono mb-1.5">
+                                    <span class="text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-server text-cyan-400"></i> REST APIs & Flask</span>
+                                    <span class="text-violetNeon font-bold">84%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full" style="width: 84%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Featured Projects -->
+        <section id="projects" class="py-24 px-4 sm:px-6 lg:px-8 border-t border-cyanNeon/10 relative">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <span class="text-xs uppercase tracking-widest text-cyanNeon font-mono font-bold bg-cyan-950/40 px-3.5 py-1 rounded-full border border-cyanNeon/30">
+                        03 // EXPERIMENTAL BUILDS
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-black font-cyber text-white mt-4">FEATURED PROJECTS</h2>
+                    <div class="w-24 h-1 bg-gradient-to-r from-cyanNeon via-blue-500 to-violet-500 mx-auto mt-4 rounded-full shadow-neon-cyan"></div>
+                </div>
+
+                <div class="flex justify-center items-center gap-3 mb-14 flex-wrap">
+                    <button onclick="filter3DProjects('all')" class="proj-filter-btn active-filter-btn px-6 py-2.5 rounded-full text-xs font-mono font-bold tracking-wider uppercase border border-cyanNeon/50 bg-cyan-500/20 text-cyanNeon shadow-neon-cyan" data-filter="all">
+                        [ All Modules ]
+                    </button>
+                    <button onclick="filter3DProjects('ai')" class="proj-filter-btn px-6 py-2.5 rounded-full text-xs font-mono font-bold tracking-wider uppercase border border-slate-800 cyber-panel text-slate-400 hover:text-white" data-filter="ai">
+                        AI & Machine Learning
+                    </button>
+                    <button onclick="filter3DProjects('iot')" class="proj-filter-btn px-6 py-2.5 rounded-full text-xs font-mono font-bold tracking-wider uppercase border border-slate-800 cyber-panel text-slate-400 hover:text-white" data-filter="iot">
+                        IoT & Telemetry
+                    </button>
+                    <button onclick="filter3DProjects('web')" class="proj-filter-btn px-6 py-2.5 rounded-full text-xs font-mono font-bold tracking-wider uppercase border border-slate-800 cyber-panel text-slate-400 hover:text-white" data-filter="web">
+                        Web Platforms
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="projectsGrid">
+                    
+                    <!-- Project 1 -->
+                    <div class="proj-card cyber-panel rounded-3xl overflow-hidden flex flex-col justify-between group" data-category="ai">
+                        <div>
+                            <div class="h-44 bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950/50 border-b border-cyanNeon/20 p-5 flex flex-col justify-between relative overflow-hidden">
+                                <div class="flex justify-between items-center relative z-10">
+                                    <span class="text-[10px] font-mono font-bold uppercase tracking-wider bg-cyan-500/20 border border-cyanNeon/40 text-cyanNeon px-3 py-1 rounded-full">
+                                        Data / AI
+                                    </span>
+                                    <span class="text-xs font-mono text-emerald-400 font-bold">94% Precision</span>
+                                </div>
+                                <div class="flex items-center justify-center my-auto relative z-10">
+                                    <i class="fa-solid fa-network-wired text-cyanNeon text-6xl opacity-75 group-hover:scale-110 group-hover:opacity-100 transition-all duration-500"></i>
+                                </div>
+                            </div>
+
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold font-cyber text-white mb-2 group-hover:text-cyanNeon transition-colors">
+                                    Predictive Maintenance AI
+                                </h3>
+                                <p class="text-slate-400 text-sm leading-relaxed mb-5">
+                                    Timeseries vibration and sensor analytics pipeline predicting mechanical breakdowns and machine wear prior to factory floor downtime.
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-6">
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-cyan-300">Python</span>
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-cyan-300">Scikit-Learn</span>
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-cyan-300">Pandas</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-6 pb-6 pt-4 border-t border-cyanNeon/20 flex items-center justify-between">
+                            <a href="https://github.com" target="_blank" rel="noreferrer" class="text-xs font-mono text-slate-300 hover:text-cyanNeon flex items-center gap-1.5 transition-colors">
+                                <i class="fa-brands fa-github text-sm"></i> Source Code
+                            </a>
+                            <button onclick="triggerHudNotification('Predictive AI telemetry preview loaded!')" class="text-xs font-mono text-cyanNeon hover:underline flex items-center gap-1">
+                                Launch Demo <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Project 2 -->
+                    <div class="proj-card cyber-panel rounded-3xl overflow-hidden flex flex-col justify-between group" data-category="iot">
+                        <div>
+                            <div class="h-44 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950/50 border-b border-blueNeon/20 p-5 flex flex-col justify-between relative overflow-hidden">
+                                <div class="flex justify-between items-center relative z-10">
+                                    <span class="text-[10px] font-mono font-bold uppercase tracking-wider bg-blue-500/20 border border-blueNeon/40 text-blueNeon px-3 py-1 rounded-full">
+                                        IoT & Telemetry
+                                    </span>
+                                    <span class="text-xs font-mono text-cyan-400">ESP32 &bull; MQTT</span>
+                                </div>
+                                <div class="flex items-center justify-center my-auto relative z-10">
+                                    <i class="fa-solid fa-microchip text-blueNeon text-6xl opacity-75 group-hover:scale-110 group-hover:opacity-100 transition-all duration-500"></i>
+                                </div>
+                            </div>
+
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold font-cyber text-white mb-2 group-hover:text-blueNeon transition-colors">
+                                    Smart Energy Telemetry Hub
+                                </h3>
+                                <p class="text-slate-400 text-sm leading-relaxed mb-5">
+                                    Distributed microcontroller energy nodes logging multi-phase amperage, voltage fluctuations, and consumption spikes via encrypted MQTT streams.
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-6">
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-blue-300">Embedded C</span>
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-blue-300">MQTT</span>
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-blue-300">Node.js</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-6 pb-6 pt-4 border-t border-cyanNeon/20 flex items-center justify-between">
+                            <a href="https://github.com" target="_blank" rel="noreferrer" class="text-xs font-mono text-slate-300 hover:text-blueNeon flex items-center gap-1.5 transition-colors">
+                                <i class="fa-brands fa-github text-sm"></i> Source Code
+                            </a>
+                            <button onclick="triggerHudNotification('Industrial telemetry stream connection established!')" class="text-xs font-mono text-blueNeon hover:underline flex items-center gap-1">
+                                Live Feeds <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Project 3 -->
+                    <div class="proj-card cyber-panel rounded-3xl overflow-hidden flex flex-col justify-between group" data-category="iot">
+                        <div>
+                            <div class="h-44 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/50 border-b border-emeraldNeon/20 p-5 flex flex-col justify-between relative overflow-hidden">
+                                <div class="flex justify-between items-center relative z-10">
+                                    <span class="text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/20 border border-emeraldNeon/40 text-emerald-400 px-3 py-1 rounded-full">
+                                        IoT & Spatial
+                                    </span>
+                                    <span class="text-xs font-mono text-emerald-400 font-bold">Hackathon Winner</span>
+                                </div>
+                                <div class="flex items-center justify-center my-auto relative z-10">
+                                    <i class="fa-solid fa-wind text-emerald-400 text-6xl opacity-75 group-hover:scale-110 group-hover:opacity-100 transition-all duration-500"></i>
+                                </div>
+                            </div>
+
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold font-cyber text-white mb-2 group-hover:text-emerald-400 transition-colors">
+                                    Spatial Air Quality Mesh
+                                </h3>
+                                <p class="text-slate-400 text-sm leading-relaxed mb-5">
+                                    Deployable micro-sensor cluster for real-time particulate matter (PM2.5/PM10) index mapping and forecasting across industrial belts.
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-6">
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-emerald-300">ESP8266</span>
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-emerald-300">Tkinter / Map</span>
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-emerald-300">Pandas</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-6 pb-6 pt-4 border-t border-cyanNeon/20 flex items-center justify-between">
+                            <a href="https://github.com" target="_blank" rel="noreferrer" class="text-xs font-mono text-slate-300 hover:text-emerald-400 flex items-center gap-1.5 transition-colors">
+                                <i class="fa-brands fa-github text-sm"></i> Source Code
+                            </a>
+                            <button onclick="triggerHudNotification('AQI spatial sensor nodes initialized!')" class="text-xs font-mono text-emerald-400 hover:underline flex items-center gap-1">
+                                Sensor Node <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Project 4 -->
+                    <div class="proj-card cyber-panel rounded-3xl overflow-hidden flex flex-col justify-between group" data-category="ai">
+                        <div>
+                            <div class="h-44 bg-gradient-to-br from-slate-950 via-slate-900 to-violet-950/50 border-b border-violetNeon/20 p-5 flex flex-col justify-between relative overflow-hidden">
+                                <div class="flex justify-between items-center relative z-10">
+                                    <span class="text-[10px] font-mono font-bold uppercase tracking-wider bg-violet-500/20 border border-violetNeon/40 text-violetNeon px-3 py-1 rounded-full">
+                                        Data / AI
+                                    </span>
+                                    <span class="text-xs font-mono text-violetNeon">Power BI &bull; SQL</span>
+                                </div>
+                                <div class="flex items-center justify-center my-auto relative z-10">
+                                    <i class="fa-solid fa-chart-pie text-violetNeon text-6xl opacity-75 group-hover:scale-110 group-hover:opacity-100 transition-all duration-500"></i>
+                                </div>
+                            </div>
+
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold font-cyber text-white mb-2 group-hover:text-violetNeon transition-colors">
+                                    Customer Churn Analytics & BI
+                                </h3>
+                                <p class="text-slate-400 text-sm leading-relaxed mb-5">
+                                    Enterprise segmentation and retention predictive models with interactive Power BI executive drill-down dashboards for decision makers.
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-6">
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-violet-300">Python</span>
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-violet-300">Power BI</span>
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-violet-300">SQL</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-6 pb-6 pt-4 border-t border-cyanNeon/20 flex items-center justify-between">
+                            <a href="https://github.com" target="_blank" rel="noreferrer" class="text-xs font-mono text-slate-300 hover:text-violetNeon flex items-center gap-1.5 transition-colors">
+                                <i class="fa-brands fa-github text-sm"></i> Source Code
+                            </a>
+                            <button onclick="triggerHudNotification('Power BI analytical dashboard viewer opened!')" class="text-xs font-mono text-violetNeon hover:underline flex items-center gap-1">
+                                Executive BI <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Project 5 -->
+                    <div class="proj-card cyber-panel rounded-3xl overflow-hidden flex flex-col justify-between group" data-category="web">
+                        <div>
+                            <div class="h-44 bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950/50 border-b border-amber-500/20 p-5 flex flex-col justify-between relative overflow-hidden">
+                                <div class="flex justify-between items-center relative z-10">
+                                    <span class="text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-500/20 border border-amber-400/40 text-amber-300 px-3 py-1 rounded-full">
+                                        Web Platform
+                                    </span>
+                                    <span class="text-xs font-mono text-slate-400">Three.js &bull; WebGL</span>
+                                </div>
+                                <div class="flex items-center justify-center my-auto relative z-10">
+                                    <i class="fa-solid fa-vr-cardboard text-amber-400 text-6xl opacity-75 group-hover:scale-110 group-hover:opacity-100 transition-all duration-500"></i>
+                                </div>
+                            </div>
+
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold font-cyber text-white mb-2 group-hover:text-amber-300 transition-colors">
+                                    Edge Telemetry Matrix
+                                </h3>
+                                <p class="text-slate-400 text-sm leading-relaxed mb-5">
+                                    Real-time WebGL canvas dashboard rendering 3D spatial node coordinates, ping latency, and telemetry matrices in dynamic space.
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-6">
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-amber-300">Three.js</span>
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-amber-300">Tailwind</span>
+                                    <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-amber-300">WebSockets</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-6 pb-6 pt-4 border-t border-cyanNeon/20 flex items-center justify-between">
+                            <a href="https://github.com" target="_blank" rel="noreferrer" class="text-xs font-mono text-slate-300 hover:text-amber-300 flex items-center gap-1.5 transition-colors">
+                                <i class="fa-brands fa-github text-sm"></i> Source Code
+                            </a>
+                            <button onclick="triggerHudNotification(' WebGL Matrix view rendered!')" class="text-xs font-mono text-amber-300 hover:underline flex items-center gap-1">
+                                Launch Matrix <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Certifications Section -->
+        <section id="certificates" class="py-24 px-4 sm:px-6 lg:px-8 border-t border-cyanNeon/10 relative">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <span class="text-xs uppercase tracking-widest text-cyanNeon font-mono font-bold bg-cyan-950/40 px-3.5 py-1 rounded-full border border-cyanNeon/30">
+                        04 // VERIFIED CREDENTIALS
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-black font-cyber text-white mt-4">CERTIFICATES & ACCREDITATIONS</h2>
+                    <div class="w-24 h-1 bg-gradient-to-r from-cyanNeon via-blue-500 to-violet-500 mx-auto mt-4 rounded-full shadow-neon-cyan"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Cert 1 -->
+                    <div class="cyber-panel rounded-3xl p-7 flex flex-col justify-between group hover:-translate-y-2 transition-all">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-[10px] font-mono uppercase tracking-wider bg-cyan-500/10 border border-cyanNeon/40 text-cyanNeon px-3 py-1 rounded-full flex items-center gap-1.5">
+                                    <i class="fa-solid fa-certificate text-xs"></i> AI & ML
+                                </span>
+                                <span class="text-xs font-mono text-emerald-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-shield-halved"></i> Verified
+                                </span>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyanNeon flex items-center justify-center text-xl mb-5 shadow-neon-cyan group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-brain"></i>
+                            </div>
+                            <h3 class="text-lg font-bold font-cyber text-white group-hover:text-cyanNeon transition-colors mb-2">
+                                AI Foundations & Machine Learning
+                            </h3>
+                            <p class="text-xs font-mono text-cyan-400 mb-3">UpTech Automation</p>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                                Training in predictive modeling, feature engineering pipelines, supervised algorithms, and neural architecture principles.
+                            </p>
+                        </div>
+                        <div class="pt-4 border-t border-cyanNeon/20 flex items-center justify-between">
+                            <span class="text-[11px] font-mono text-slate-500">ID: FSP-AI-84920</span>
+                            <button onclick="openCertModal('AI Foundations & Machine Learning', 'UpTech Automation', 'Issued: 2026 &bull; ID: FSP-AI-84920', 'Demonstrated mastery in Python data manipulation, Scikit-Learn algorithm evaluation, regression/classification pipelines, and applied statistical intelligence for industrial data pipelines.', 'fa-brain', 'text-cyanNeon')" class="text-xs font-mono text-cyanNeon hover:underline flex items-center gap-1.5">
+                                View Proof <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cert 2 -->
+                    <div class="cyber-panel rounded-3xl p-7 flex flex-col justify-between group hover:-translate-y-2 transition-all">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-[10px] font-mono uppercase tracking-wider bg-blue-500/10 border border-blueNeon/40 text-blueNeon px-3 py-1 rounded-full flex items-center gap-1.5">
+                                    <i class="fa-solid fa-chart-pie text-xs"></i> BI & Data
+                                </span>
+                                <span class="text-xs font-mono text-emerald-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-shield-halved"></i> Verified
+                                </span>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/20 text-blueNeon flex items-center justify-center text-xl mb-5 shadow-neon-blue group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-chart-column"></i>
+                            </div>
+                            <h3 class="text-lg font-bold font-cyber text-white group-hover:text-blueNeon transition-colors mb-2">
+                                Power BI Data Analytics Specialist
+                            </h3>
+                            <p class="text-xs font-mono text-blue-400 mb-3">Skill Course</p>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                                DAX formulas, interactive KPI drill-down dashboards, star-schema data modeling, and automated executive visual telemetry.
+                            </p>
+                        </div>
+                        <div class="pt-4 border-t border-cyanNeon/20 flex items-center justify-between">
+                            <span class="text-[11px] font-mono text-slate-500">ID: SC-589C9CC5B5</span>
+                            <button onclick="openCertModal('Power BI Data Analytics Specialist', 'Skill Course', 'Issued: 2026 &bull; ID: SC-589C9CC5B5', 'Certified expertise in building production Power BI dashboards, advanced DAX calculated measures, data warehousing connectivity, and business intelligence reporting.', 'fa-chart-column', 'text-blueNeon')" class="text-xs font-mono text-blueNeon hover:underline flex items-center gap-1.5">
+                                View Proof <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cert 3 -->
+                    <div class="cyber-panel rounded-3xl p-7 flex flex-col justify-between group hover:-translate-y-2 transition-all">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-[10px] font-mono uppercase tracking-wider bg-violet-500/10 border border-violetNeon/40 text-violetNeon px-3 py-1 rounded-full flex items-center gap-1.5">
+                                    <i class="fa-brands fa-python text-xs"></i> Programming
+                                </span>
+                                <span class="text-xs font-mono text-emerald-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-shield-halved"></i> Verified
+                                </span>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-violet-500/20 text-violetNeon flex items-center justify-center text-xl mb-5 shadow-neon-violet group-hover:scale-110 transition-transform">
+                                <i class="fa-brands fa-python"></i>
+                            </div>
+                            <h3 class="text-lg font-bold font-cyber text-white group-hover:text-violetNeon transition-colors mb-2">
+                                Python for Data Science & Automation
+                            </h3>
+                            <p class="text-xs font-mono text-violet-400 mb-3">Technoglobe &bull; Trustingbrains</p>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                                Vectorized computing with NumPy, Pandas dataframes, Matplotlib/Seaborn visualization, and clean algorithmic scripting.
+                            </p>
+                        </div>
+                        <div class="pt-4 border-t border-cyanNeon/20 flex items-center justify-between">
+                            <span class="text-[11px] font-mono text-slate-500">ID: PY-DS-67311</span>
+                            <button onclick="openCertModal('Python for Data Science & Automation', 'Technoglobe &bull; Trustingbrains', 'Issued: 2026 &bull; ID: PY-DS-67311', 'Hands-on practical certification covering object-oriented Python, automated data ingestion pipelines, numerical computing with NumPy, and EDA with Pandas.', 'fa-python', 'text-violetNeon')" class="text-xs font-mono text-violetNeon hover:underline flex items-center gap-1.5">
+                                View Proof <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Experience & Milestones -->
+        <section id="experience" class="py-24 px-4 sm:px-6 lg:px-8 border-t border-cyanNeon/10 relative">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="text-xs uppercase tracking-widest text-cyanNeon font-mono font-bold bg-cyan-950/40 px-3.5 py-1 rounded-full border border-cyanNeon/30">
+                        05 // SYSTEM HISTORY
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-black font-cyber text-white mt-4">EXPERIENCE & MILESTONES</h2>
+                    <div class="w-24 h-1 bg-gradient-to-r from-cyanNeon via-blue-500 to-violet-500 mx-auto mt-4 rounded-full shadow-neon-cyan"></div>
+                </div>
+
+                <div class="relative border-l-2 border-cyanNeon/40 ml-4 md:ml-36 space-y-12">
+                    <div class="relative pl-8 group">
+                        <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-cyanNeon shadow-neon-cyan group-hover:scale-150 transition-transform"></div>
+                        <div class="cyber-panel p-7 rounded-3xl hover:border-cyanNeon/50 transition-all">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                <span class="text-xs font-mono text-cyanNeon uppercase tracking-widest bg-cyan-950/60 px-3 py-1 rounded-full border border-cyanNeon/40">2024 - Present</span>
+                                <span class="text-xs font-mono text-slate-400">Industry Experience</span>
+                            </div>
+                            <h3 class="text-xl font-bold font-cyber text-white">Data & ML Developer</h3>
+                            <p class="text-cyanNeon font-mono text-sm mt-0.5">IoT Monitoring Systems</p>
+                            <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+                                Engineered scalable ETL pipelines for industrial telemetry streams and fine-tuned predictive anomaly models, boosting defect detection latency by 35%.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="relative pl-8 group">
+                        <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-blueNeon shadow-neon-blue group-hover:scale-150 transition-transform"></div>
+                        <div class="cyber-panel p-7 rounded-3xl hover:border-blueNeon/50 transition-all">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                <span class="text-xs font-mono text-blueNeon uppercase tracking-widest bg-blue-950/60 px-3 py-1 rounded-full border border-blueNeon/40">2024 - 2026</span>
+                                <span class="text-xs font-mono text-slate-400">Club Leadership</span>
+                            </div>
+                            <h3 class="text-xl font-bold font-cyber text-white">Technical Lead & Coordinator</h3>
+                            <p class="text-blueNeon font-mono text-sm mt-0.5">IoT & Robotics Society</p>
+                            <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+                                Conducted hands-on bootcamps for 120+ students covering microcontroller flashing, MQTT broker configuration, and Python data visualization tools.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Cyber CLI Terminal Shell -->
+        <section id="terminal" class="py-20 px-4 sm:px-6 lg:px-8 border-t border-cyanNeon/10">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-10">
+                    <span class="text-xs uppercase tracking-widest text-cyanNeon font-mono font-bold bg-cyan-950/40 px-3.5 py-1 rounded-full border border-cyanNeon/30">
+                        06 // COMMAND LINE INTERFACE
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-black font-cyber text-white mt-4">NEURAL TERMINAL HUD</h2>
+                </div>
+
+                <div class="cyber-panel rounded-3xl border border-cyanNeon/30 overflow-hidden shadow-neon-cyan">
+                    <div class="bg-slate-950/90 px-4 py-3 border-b border-cyanNeon/20 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                            <span class="text-xs font-mono text-slate-400 ml-2">shivansh@neural-core:~</span>
+                        </div>
+                        <div class="text-[11px] font-mono text-cyanNeon hidden sm:block">WebGL Shaders Active</div>
+                    </div>
+
+                    <div class="p-6 font-mono text-xs sm:text-sm bg-slate-950/80 min-h-[200px] max-h-[320px] overflow-y-auto" id="terminalScreen">
+                        <p class="text-slate-400 mb-2">Terminal v2.6.4 online. Type <span class="text-cyanNeon font-bold">help</span> or press any chip below to execute commands.</p>
+                        <div id="termLogs"></div>
+                        <div class="flex items-center text-cyanNeon mt-2">
+                            <span class="mr-2 text-emerald-400 font-bold">guest@sd-terminal:~$</span>
+                            <input type="text" id="termInput" class="bg-transparent text-white border-none outline-none flex-1 font-mono text-xs sm:text-sm" placeholder="Type 'skills', 'cert', 'matrix', 'help'..." autocomplete="off" />
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/70 px-4 py-2.5 border-t border-cyanNeon/20 flex items-center gap-2 overflow-x-auto text-[11px] font-mono text-slate-400">
+                        <span class="text-slate-500">Quick run:</span>
+                        <button onclick="executeTerm('bio')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyanNeon/20 hover:text-cyanNeon transition-colors">bio</button>
+                        <button onclick="executeTerm('skills')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyanNeon/20 hover:text-cyanNeon transition-colors">skills</button>
+                        <button onclick="executeTerm('cert')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyanNeon/20 hover:text-cyanNeon transition-colors">cert</button>
+                        <button onclick="executeTerm('projects')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyanNeon/20 hover:text-cyanNeon transition-colors">projects</button>
+                        <button onclick="executeTerm('telemetry')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyanNeon/20 hover:text-cyanNeon transition-colors">telemetry</button>
+                        <button onclick="executeTerm('clear')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-rose-500/20 hover:text-rose-300 transition-colors">clear</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. Interactive Contact Form -->
+        <section id="contact" class="py-24 px-4 sm:px-6 lg:px-8 border-t border-cyanNeon/10 relative">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="text-xs uppercase tracking-widest text-cyanNeon font-mono font-bold bg-cyan-950/40 px-3.5 py-1 rounded-full border border-cyanNeon/30">
+                        07 // TRANSMISSION NODE
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-black font-cyber text-white mt-4">CONNECT WITH SHIVANSH</h2>
+                    <div class="w-24 h-1 bg-gradient-to-r from-cyanNeon via-blue-500 to-violet-500 mx-auto mt-4 rounded-full shadow-neon-cyan"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+                    <div class="md:col-span-2 cyber-panel p-8 rounded-3xl flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-2xl font-bold font-cyber text-white mb-3">Transmission Coordinates</h3>
+                            <p class="text-slate-400 text-sm mb-8 leading-relaxed">
+                                Ready to collaborate on predictive machine learning, high-speed telemetry, or scalable web systems. Drop a line anytime.
+                            </p>
+
+                            <div class="space-y-5 text-sm">
+                                <div class="flex items-center space-x-3.5 text-slate-300">
+                                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyanNeon border border-cyanNeon/40 flex items-center justify-center shrink-0">
+                                        <i class="fa-regular fa-envelope"></i>
+                                    </div>
+                                    <div class="truncate">
+                                        <span class="text-[10px] font-mono block text-slate-400">Direct Email</span>
+                                        <span class="text-white font-medium hover:text-cyanNeon cursor-pointer" onclick="copyContactEmail()">shivanshdwivedi175@gmail.com</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center space-x-3.5 text-slate-300">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blueNeon border border-blueNeon/40 flex items-center justify-center shrink-0">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] font-mono block text-slate-400">Physical Origin</span>
+                                        <span class="text-white font-medium">Ghaziabad / New Delhi &bull; Remote Available</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center space-x-3.5 text-slate-300">
+                                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emeraldNeon/40 flex items-center justify-center shrink-0">
+                                        <i class="fa-solid fa-bolt"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] font-mono block text-slate-400">Node Status</span>
+                                        <span class="text-emerald-400 font-medium">Ready for Deployments</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 pt-6 border-t border-cyanNeon/20 flex items-center space-x-3">
+                            <a href="https://github.com" target="_blank" rel="noreferrer" class="w-10 h-10 rounded-xl cyber-panel flex items-center justify-center hover:text-cyanNeon hover:border-cyanNeon transition-all">
+                                <i class="fa-brands fa-github"></i>
+                            </a>
+                            <a href="https://linkedin.com" target="_blank" rel="noreferrer" class="w-10 h-10 rounded-xl cyber-panel flex items-center justify-center hover:text-blueNeon hover:border-blueNeon transition-all">
+                                <i class="fa-brands fa-linkedin-in"></i>
+                            </a>
+                            <button onclick="copyContactEmail()" class="w-10 h-10 rounded-xl cyber-panel flex items-center justify-center hover:text-emerald-400 hover:border-emerald-400 transition-all" title="Copy Email">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-3 cyber-panel p-8 rounded-3xl">
+                        <form id="cyberContactForm" class="space-y-5">
+                            <div>
+                                <label for="txName" class="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-2">Transmitter Name</label>
+                                <input type="text" id="txName" name="name" required placeholder="Name" class="w-full bg-slate-950/80 border border-cyanNeon/30 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyanNeon focus:ring-1 focus:ring-cyanNeon transition-colors" />
+                            </div>
+
+                            <div>
+                                <label for="txEmail" class="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-2">Return Signal Address</label>
+                                <input type="email" id="txEmail" name="email" required placeholder="Email" class="w-full bg-slate-950/80 border border-cyanNeon/30 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyanNeon focus:ring-1 focus:ring-cyanNeon transition-colors" />
+                            </div>
+
+                            <div>
+                                <label for="txMessage" class="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-2">Payload Data</label>
+                                <textarea id="txMessage" name="message" rows="4" required placeholder="Let's engineer an ML telemetry stream or discuss project timelines..." class="w-full bg-slate-950/80 border border-cyanNeon/30 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyanNeon focus:ring-1 focus:ring-cyanNeon transition-colors resize-none"></textarea>
+                            </div>
+
+                            <button type="submit" id="txBtn" class="w-full py-4 rounded-xl font-cyber font-bold text-slate-950 bg-gradient-to-r from-cyanNeon via-cyan-400 to-blue-500 hover:shadow-neon-cyan transition-all duration-300 transform active:scale-[0.99] flex items-center justify-center gap-2 text-xs uppercase tracking-wider">
+                                <span>Transmit Encrypted Packet</span>
+                                <i class="fa-solid fa-paper-plane text-xs"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-cyanNeon/20 py-10 px-4 sm:px-6 relative z-10 bg-slate-950">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="text-slate-500 text-xs font-mono text-center sm:text-left">
+                &copy; <span id="copyrightYear"></span> Shivansh Dwivedi. High-Performance Three.js & Tailwind Core.
+            </div>
+
+            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="px-4 py-2 rounded-xl cyber-panel text-xs font-mono text-cyanNeon hover:border-cyanNeon transition-all flex items-center space-x-2">
+                <span>Warp to Top</span>
+                <i class="fa-solid fa-arrow-up"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Interactive Certificate Hologram Modal -->
+    <div id="certModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="cyber-panel border border-cyanNeon/40 rounded-3xl max-w-xl w-full p-8 shadow-neon-cyan relative transform scale-95 transition-transform duration-300" id="certModalCard">
+            <button onclick="closeCertModal()" class="absolute top-5 right-5 w-9 h-9 rounded-xl cyber-panel border border-slate-700 hover:border-rose-400 text-slate-400 hover:text-rose-400 flex items-center justify-center text-sm transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyanNeon flex items-center justify-center text-2xl" id="certModalIconBox">
+                    <i id="certModalIcon" class="fa-solid fa-brain"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-mono uppercase tracking-widest text-emerald-400 flex items-center gap-1">
+                        <i class="fa-solid fa-shield-halved"></i> Cryptographically Verified
+                    </span>
+                    <h3 id="certModalTitle" class="text-lg sm:text-xl font-bold font-cyber text-white">Certificate Name</h3>
+                </div>
+            </div>
+
+            <div class="space-y-3 font-mono text-xs bg-slate-950/60 p-4 rounded-2xl border border-cyanNeon/20 mb-6">
+                <div class="flex justify-between text-slate-400">
+                    <span>Issuing Body:</span>
+                    <span id="certModalIssuer" class="text-cyanNeon font-bold">Organization</span>
+                </div>
+                <div class="flex justify-between text-slate-400">
+                    <span>Credential Metadata:</span>
+                    <span id="certModalMeta" class="text-slate-300">Issued 2024</span>
+                </div>
+            </div>
+
+            <p id="certModalDesc" class="text-slate-300 text-sm leading-relaxed mb-6 font-sans">
+                Detailed credential description goes here.
+            </p>
+
+            <div class="flex gap-3">
+                <button onclick="triggerHudNotification('Certificate credential verification link confirmed.'); closeCertModal();" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-cyanNeon to-blue-600 text-slate-950 font-cyber font-bold text-xs uppercase tracking-wider shadow-neon-cyan hover:brightness-110 flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-check-double text-xs"></i> <span>Acknowledge Credential</span>
+                </button>
+                <button onclick="closeCertModal()" class="px-5 py-3 rounded-xl cyber-panel border border-slate-700 hover:border-slate-500 text-slate-300 text-xs font-mono transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WebAudio, Three.js, Interactive Scripts & Integrated Backend Connector -->
+    <script>
+        document.getElementById('copyrightYear').textContent = new Date().getFullYear();
+
+        class CyberAudio {
+            constructor() {
+                this.ctx = null;
+                this.isMuted = true;
+                this.droneGain = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioCtx();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            toggle() {
+                this.init();
+                this.isMuted = !this.isMuted;
+                const icon = document.getElementById('audioIcon');
+
+                if (this.isMuted) {
+                    icon.className = 'fa-solid fa-volume-xmark';
+                    if (this.droneGain) {
+                        this.droneGain.gain.setValueAtTime(0, this.ctx.currentTime);
+                    }
+                    triggerHudNotification("Audio Synthesizer Muted");
+                } else {
+                    icon.className = 'fa-solid fa-volume-high text-cyanNeon';
+                    this.startDrone();
+                    this.playChirp();
+                    triggerHudNotification(" Cyber Synthesizer Engaged");
+                }
+            }
+
+            startDrone() {
+                if (!this.ctx || this.isMuted) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    this.droneGain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(55, this.ctx.currentTime);
+
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(220, this.ctx.currentTime);
+
+                    this.droneGain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+
+                    osc.connect(filter);
+                    filter.connect(this.droneGain);
+                    this.droneGain.connect(this.ctx.destination);
+                    osc.start();
+                } catch(e) {}
+            }
+
+            playChirp() {
+                if (this.isMuted || !this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1400, this.ctx.currentTime + 0.08);
+
+                    gain.gain.setValueAtTime(0.06, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.08);
+                } catch(e) {}
+            }
+
+            playLaser() {
+                if (this.isMuted || !this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(980, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.2);
+
+                    gain.gain.setValueAtTime(0.07, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.2);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.2);
+                } catch(e) {}
+            }
+        }
+        const soundEngine = new CyberAudio();
+        function toggleAudio() {
+            soundEngine.toggle();
+        }
+
+        const canvas = document.getElementById('webgl-canvas');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x030712, 0.025);
+
+        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 13);
+
+        const renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true,
+            alpha: true,
+            powerPreference: 'high-performance'
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const ambientLight = new THREE.AmbientLight(0x00f0ff, 0.6);
+        scene.add(ambientLight);
+
+        const cyanLight = new THREE.PointLight(0x00f0ff, 2.5, 50);
+        cyanLight.position.set(10, 15, 10);
+        scene.add(cyanLight);
+
+        const violetLight = new THREE.PointLight(0x8b5cf6, 2.5, 50);
+        violetLight.position.set(-10, -10, -5);
+        scene.add(violetLight);
+
+        const worldGroup = new THREE.Group();
+        scene.add(worldGroup);
+
+        const knotGeometry = new THREE.TorusKnotGeometry(2.2, 0.55, 120, 24);
+        const knotMaterial = new THREE.MeshStandardMaterial({
+            color: 0x00f0ff,
+            emissive: 0x004866,
+            roughness: 0.2,
+            metalness: 0.9,
+            wireframe: true
+        });
+        const neuralKnot = new THREE.Mesh(knotGeometry, knotMaterial);
+        worldGroup.add(neuralKnot);
+
+        const cageGeo = new THREE.IcosahedronGeometry(4.2, 1);
+        const cageMat = new THREE.MeshBasicMaterial({
+            color: 0x3b82f6,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.25
+        });
+        const outerCage = new THREE.Mesh(cageGeo, cageMat);
+        worldGroup.add(outerCage);
+
+        const ringGeo = new THREE.TorusGeometry(3.6, 0.03, 16, 100);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.6 });
+        const orbitRing1 = new THREE.Mesh(ringGeo, ringMat);
+        orbitRing1.rotation.x = Math.PI / 3;
+        worldGroup.add(orbitRing1);
+
+        const orbitRing2 = new THREE.Mesh(ringGeo, ringMat.clone());
+        orbitRing2.material.color.setHex(0x00f0ff);
+        orbitRing2.rotation.y = Math.PI / 4;
+        worldGroup.add(orbitRing2);
+
+        const starCount = 1200;
+        const starGeometry = new THREE.BufferGeometry();
+        const starPositions = new Float32Array(starCount * 3);
+        const starColors = new Float32Array(starCount * 3);
+
+        for (let i = 0; i < starCount * 3; i += 3) {
+            starPositions[i] = (Math.random() - 0.5) * 80;
+            starPositions[i + 1] = (Math.random() - 0.5) * 80;
+            starPositions[i + 2] = (Math.random() - 0.5) * 80;
+
+            const isCyan = Math.random() > 0.5;
+            starColors[i] = isCyan ? 0.0 : 0.54;
+            starColors[i + 1] = isCyan ? 0.94 : 0.36;
+            starColors[i + 2] = isCyan ? 1.0 : 0.96;
+        }
+
+        starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+
+        const starMaterial = new THREE.PointsMaterial({
+            size: 0.14,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8
+        });
+        const starField = new THREE.Points(starGeometry, starMaterial);
+        scene.add(starField);
+
+        const gridHelper = new THREE.GridHelper(90, 45, 0x00f0ff, 0x1e293b);
+        gridHelper.position.y = -6.5;
+        scene.add(gridHelper);
+
+        const interactiveNodes = [];
+        const nodeLabels = [
+            "ML Ingestion Node",
+            "ESP32 Telemetry Hub",
+            "MQTT Broker v3.1",
+            "Scikit Pipeline Core",
+            "Power BI Analytics Mesh"
+        ];
+        const nodeColors = [0x00f0ff, 0x3b82f6, 0x8b5cf6, 0x10b981, 0xf59e0b];
+
+        for (let i = 0; i < 5; i++) {
+            const angle = (i / 5) * Math.PI * 2;
+            const radius = 5.2;
+            const sphereGeo = new THREE.SphereGeometry(0.35, 16, 16);
+            const sphereMat = new THREE.MeshStandardMaterial({
+                color: nodeColors[i],
+                emissive: nodeColors[i],
+                emissiveIntensity: 0.7,
+                roughness: 0.1
+            });
+            const nodeMesh = new THREE.Mesh(sphereGeo, sphereMat);
+            nodeMesh.position.set(Math.cos(angle) * radius, Math.sin(angle) * 1.5, Math.sin(angle) * radius);
+            nodeMesh.userData = {
+                label: nodeLabels[i],
+                baseColor: nodeColors[i],
+                originalY: nodeMesh.position.y
+            };
+            worldGroup.add(nodeMesh);
+            interactiveNodes.push(nodeMesh);
+        }
+
+        const raycaster = new THREE.Raycaster();
+        const mouse2D = new THREE.Vector2(-999, -999);
+        const targetMouse = new THREE.Vector2(0, 0);
+        const tooltip = document.getElementById('raycastTooltip');
+        const tooltipContent = document.getElementById('tooltipContent');
+
+        window.addEventListener('mousemove', (e) => {
+            targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            mouse2D.x = targetMouse.x;
+            mouse2D.y = targetMouse.y;
+
+            tooltip.style.left = `${e.clientX}px`;
+            tooltip.style.top = `${e.clientY}px`;
+        });
+
+        window.addEventListener('click', () => {
+            raycaster.setFromCamera(mouse2D, camera);
+            const intersects = raycaster.intersectObjects(interactiveNodes);
+            if (intersects.length > 0) {
+                const node = intersects[0].object;
+                soundEngine.playLaser();
+                triggerHudNotification(`Synchronized with ${node.userData.label}`);
+                pulse3DCore();
+            }
+        });
+
+        function pulse3DCore() {
+            neuralKnot.scale.set(1.3, 1.3, 1.3);
+            setTimeout(() => {
+                neuralKnot.scale.set(1, 1, 1);
+            }, 300);
+        }
+
+        let scrollY = 0;
+        window.addEventListener('scroll', () => {
+            scrollY = window.scrollY;
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        let lastTime = performance.now();
+        let frameCount = 0;
+        const teleCamPos = document.getElementById('teleCamPos');
+        const teleCamRot = document.getElementById('teleCamRot');
+        const teleFps = document.getElementById('teleFps');
+
+        function animate3DWorld(now) {
+            requestAnimationFrame(animate3DWorld);
+
+            frameCount++;
+            if (now - lastTime >= 1000) {
+                if (teleFps) teleFps.textContent = `${frameCount} FPS`;
+                frameCount = 0;
+                lastTime = now;
+            }
+
+            neuralKnot.rotation.x += 0.007;
+            neuralKnot.rotation.y += 0.009;
+            outerCage.rotation.y -= 0.003;
+            orbitRing1.rotation.z += 0.006;
+            orbitRing2.rotation.x += 0.005;
+
+            const timeSec = now * 0.001;
+            interactiveNodes.forEach((node, idx) => {
+                const angle = timeSec * 0.6 + (idx / 5) * Math.PI * 2;
+                node.position.x = Math.cos(angle) * 5.2;
+                node.position.z = Math.sin(angle) * 5.2;
+                node.position.y = node.userData.originalY + Math.sin(timeSec * 2 + idx) * 0.4;
+            });
+
+            const totalScroll = document.body.scrollHeight - window.innerHeight;
+            const scrollFraction = totalScroll > 0 ? scrollY / totalScroll : 0;
+
+            const targetCamZ = 13 - scrollFraction * 6.5;
+            const targetCamY = -scrollFraction * 5.5;
+            const targetCamX = Math.sin(scrollFraction * Math.PI * 2) * 2.5 + targetMouse.x * 1.5;
+
+            camera.position.x += (targetCamX - camera.position.x) * 0.05;
+            camera.position.y += (targetCamY - camera.position.y) * 0.05;
+            camera.position.z += (targetCamZ - camera.position.z) * 0.05;
+
+            worldGroup.rotation.y = targetMouse.x * 0.3;
+            worldGroup.rotation.x = -targetMouse.y * 0.2;
+
+            camera.lookAt(0, targetCamY * 0.5, 0);
+
+            if (teleCamPos) {
+                teleCamPos.textContent = `X:${camera.position.x.toFixed(1)} Y:${camera.position.y.toFixed(1)} Z:${camera.position.z.toFixed(1)}`;
+            }
+            if (teleCamRot) {
+                teleCamRot.textContent = `${camera.rotation.x.toFixed(2)} / ${camera.rotation.y.toFixed(2)}`;
+            }
+
+            raycaster.setFromCamera(mouse2D, camera);
+            const hits = raycaster.intersectObjects(interactiveNodes);
+            if (hits.length > 0) {
+                const hitObj = hits[0].object;
+                hitObj.material.emissiveIntensity = 2.0;
+                hitObj.scale.set(1.4, 1.4, 1.4);
+                tooltip.style.opacity = '1';
+                tooltipContent.textContent = hitObj.userData.label;
+                canvas.style.cursor = 'pointer';
+            } else {
+                interactiveNodes.forEach(node => {
+                    node.material.emissiveIntensity = 0.7;
+                    node.scale.set(1, 1, 1);
+                });
+                tooltip.style.opacity = '0';
+                canvas.style.cursor = 'default';
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function toggleScanlines() {
+            const scan = document.getElementById('scanlineOverlay');
+            scan.classList.toggle('disabled');
+            soundEngine.playChirp();
+            triggerHudNotification("Display Scanlines Toggled");
+        }
+
+        const heroPhrases = [
+            "Data Science & Predictive ML Architect",
+            "Industrial IoT & Telemetry Engineer",
+            "Python & Autonomous Systems Builder",
+            "Fullstack WebGL Spatial Explorer"
+        ];
+        let hIdx = 0, cIdx = 0, isDeleting = false;
+        const typeEl = document.getElementById('heroTypewriterText');
+
+        function loopHeroType() {
+            const current = heroPhrases[hIdx];
+            if (isDeleting) {
+                typeEl.textContent = current.substring(0, cIdx - 1);
+                cIdx--;
+            } else {
+                typeEl.textContent = current.substring(0, cIdx + 1);
+                cIdx++;
+            }
+
+            let speed = isDeleting ? 35 : 75;
+
+            if (!isDeleting && cIdx === current.length) {
+                speed = 2000;
+                isDeleting = true;
+            } else if (isDeleting && cIdx === 0) {
+                isDeleting = false;
+                hIdx = (hIdx + 1) % heroPhrases.length;
+                speed = 300;
+            }
+            setTimeout(loopHeroType, speed);
+        }
+
+        function filter3DProjects(cat) {
+            soundEngine.playChirp();
+            const cards = document.querySelectorAll('.proj-card');
+            const btns = document.querySelectorAll('.proj-filter-btn');
+
+            btns.forEach(b => {
+                if (b.getAttribute('data-filter') === cat) {
+                    b.className = "proj-filter-btn active-filter-btn px-6 py-2.5 rounded-full text-xs font-mono font-bold tracking-wider uppercase border border-cyanNeon/50 bg-cyan-500/20 text-cyanNeon shadow-neon-cyan";
+                } else {
+                    b.className = "proj-filter-btn px-6 py-2.5 rounded-full text-xs font-mono font-bold tracking-wider uppercase border border-slate-800 cyber-panel text-slate-400 hover:text-white";
+                }
+            });
+
+            cards.forEach(card => {
+                const cCat = card.getAttribute('data-category');
+                if (cat === 'all' || cCat === cat) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        const termInput = document.getElementById('termInput');
+        const termLogs = document.getElementById('termLogs');
+        const termScreen = document.getElementById('terminalScreen');
+
+        const cliKnowledge = {
+            bio: "Shivansh Dwivedi: Data Scientist, ML developer & Industrial IoT engineer. Building predictive machine learning workflows and real-time microcontroller telemetry.",
+            skills: "Languages: Python, SQL, Embedded C, JS. Frameworks: Scikit-Learn, Pandas, NumPy, Power BI, ESP32/ESP8266, MQTT, Docker, Three.js.",
+            projects: "1. Predictive Maintenance AI | 2. Smart Energy Telemetry Hub | 3. Spatial AQI Mesh | 4. Customer Churn BI | 5.  Telemetry Matrix",
+            cert: "1. AI Foundations | 2. Power BI Specialist | 3. Python for Data Science | 4. Embedded IoT Protocols | 5. Relational SQL",
+            telemetry: "STATUS: NOMINAL // SHADERS: ACTIVE // FPS: 60 // SENSOR BROKERS: CONNECTED",
+            help: "Commands available: bio, skills, projects, cert, telemetry, contact, clear"
+        };
+
+        function executeTerm(cmd) {
+            cmd = cmd.trim().toLowerCase();
+            soundEngine.playChirp();
+
+            if (cmd === 'clear') {
+                termLogs.innerHTML = '';
+                return;
+            }
+
+            const row = document.createElement('div');
+            row.className = "mb-2";
+
+            let res = "";
+            if (cliKnowledge[cmd]) {
+                res = cliKnowledge[cmd];
+            } else if (cmd === 'contact') {
+                res = "Direct Transmit: shivanshdwivedi175@gmail.com | New Delhi / Ghaziabad / Remote";
+            } else if (cmd === '') {
+                res = "";
+            } else {
+                res = `command '${cmd}' not recognized in neural register. Type 'help'.`;
+            }
+
+            row.innerHTML = `
+                <div class="text-cyanNeon"><span class="text-emerald-400">guest@sd-terminal:~$</span> ${cmd}</div>
+                <div class="text-slate-300 ml-3 mt-0.5">${res}</div>
+            `;
+            termLogs.appendChild(row);
+            termScreen.scrollTop = termScreen.scrollHeight;
+        }
+
+        termInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                executeTerm(termInput.value);
+                termInput.value = '';
+            }
+        });
+
+        function triggerHudNotification(msg) {
+            const toast = document.getElementById('hudToast');
+            const msgEl = document.getElementById('hudToastMsg');
+            msgEl.textContent = msg;
+
+            toast.classList.remove('translate-y-32', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-32', 'opacity-0');
+            }, 3200);
+        }
+
+        function copyContactEmail() {
+            soundEngine.playChirp();
+            navigator.clipboard.writeText('shivanshdwivedi175@gmail.com').then(() => {
+                triggerHudNotification("Copied: shivanshdwivedi175@gmail.com");
+            }).catch(() => {
+                triggerHudNotification("Failed to copy clipboard");
+            });
+        }
+
+        const BACKEND_URL = 'http://127.0.0.1:5000/submit';
+
+        document.getElementById('cyberContactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            soundEngine.playLaser();
+            
+            const btn = document.getElementById('txBtn');
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-satellite-dish fa-spin mr-2"></i> Encrypting & Transmitting...`;
+
+            const payload = {
+                name: document.getElementById('txName').value.trim(),
+                email: document.getElementById('txEmail').value.trim(),
+                message: document.getElementById('txMessage').value.trim()
+            };
+
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const resData = await response.json();
+
+                if (response.ok && resData.status === 'success') {
+                    triggerHudNotification(`Packet transmitted! Message logged in MySQL.`);
+                    document.getElementById('cyberContactForm').reset();
+                } else {
+                    triggerHudNotification(`Notice: ${resData.message || 'Data logged.'}`);
+                }
+            } catch (err) {
+                console.warn('Backend offline, simulated send:', err);
+                triggerHudNotification(`Signal cached! Start Flask backend to sync with MySQL.`);
+                document.getElementById('cyberContactForm').reset();
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            }
+        });
+
+        const mobileToggle = document.getElementById('mobileNavToggle');
+        const mobileDropdown = document.getElementById('mobileNavDropdown');
+        const mobileIcon = document.getElementById('mobileNavIcon');
+
+        mobileToggle.addEventListener('click', () => {
+            soundEngine.playChirp();
+            const isHidden = mobileDropdown.classList.contains('hidden');
+            if (isHidden) {
+                mobileDropdown.classList.remove('hidden');
+                mobileIcon.className = "fa-solid fa-xmark";
+            } else {
+                mobileDropdown.classList.add('hidden');
+                mobileIcon.className = "fa-solid fa-bars";
+            }
+        });
+
+        document.querySelectorAll('.mobile-item').forEach(el => {
+            el.addEventListener('click', () => {
+                mobileDropdown.classList.add('hidden');
+                mobileIcon.className = "fa-solid fa-bars";
+            });
+        });
+
+        function openCertModal(title, issuer, meta, desc, iconClass, colorClass) {
+            soundEngine.playLaser();
+            document.getElementById('certModalTitle').textContent = title;
+            document.getElementById('certModalIssuer').textContent = issuer;
+            document.getElementById('certModalMeta').innerHTML = meta;
+            document.getElementById('certModalDesc').textContent = desc;
+
+            const iconEl = document.getElementById('certModalIcon');
+            iconEl.className = `fa-solid ${iconClass} ${colorClass}`;
+
+            const modal = document.getElementById('certModal');
+            const card = document.getElementById('certModalCard');
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100', 'pointer-events-auto');
+            card.classList.remove('scale-95');
+            card.classList.add('scale-100');
+        }
+
+        function closeCertModal() {
+            soundEngine.playChirp();
+            const modal = document.getElementById('certModal');
+            const card = document.getElementById('certModalCard');
+
+            modal.classList.remove('opacity-100', 'pointer-events-auto');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+        }
+
+        window.onload = function () {
+            requestAnimationFrame(animate3DWorld);
+            loopHeroType();
+        };
+    </script>
+</body>
+</html>
